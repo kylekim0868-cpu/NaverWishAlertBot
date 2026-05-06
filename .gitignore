@@ -1,0 +1,16 @@
+# ==============================
+# 환경 변수 파일 (절대 커밋 금지)
+# ==============================
+.env.development
+.env.production
+# .env.example 은 커밋 허용 (민감 정보 없는 템플릿)
+
+# DB 파일
+data/
+
+# Node.js
+node_modules/
+npm-debug.log*
+
+# 런타임 로그
+*.log

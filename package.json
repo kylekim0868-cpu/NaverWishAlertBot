@@ -1,0 +1,21 @@
+{
+  "name": "naverswishalertbot",
+  "version": "1.0.0",
+  "description": "Naver Shopping wishlist price/availability alert bot using Playwright",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node -e \"process.env.NODE_ENV='development'; require('./index.js')\"",
+    "start": "node -e \"process.env.NODE_ENV='production'; require('./index.js')\"",
+    "seed:dev": "node -e \"process.env.NODE_ENV='development'; require('./seedConfig.js')\"",
+    "seed:prod": "node -e \"process.env.NODE_ENV='production'; require('./seedConfig.js')\""
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.9.0",
+    "dotenv": "^17.4.2",
+    "playwright-core": "^1.58.2"
+  }
+}
