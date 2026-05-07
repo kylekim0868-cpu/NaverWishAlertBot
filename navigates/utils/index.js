@@ -13,8 +13,8 @@ function getCommonConfig() {
   return {
     searchInputTimeoutMs:  getEnvNumber("BOT_SEARCH_INPUT_TIMEOUT_MS",  10000, 500),
     navigationTimeoutMs:   getEnvNumber("BOT_NAV_TIMEOUT_MS",           30000, 1000),
-    pageLoadWaitMs:        getEnvNumber("BOT_PAGE_LOAD_WAIT_MS",         2000, 200),
-    actionDelayMs:         getEnvNumber("BOT_ACTION_DELAY_MS",            800, 100),
+    pageLoadWaitMs:        getEnvNumber("BOT_PAGE_LOAD_WAIT_MS",          300, 200),
+    actionDelayMs:         getEnvNumber("BOT_ACTION_DELAY_MS",            120, 100),
   };
 }
 
@@ -136,7 +136,7 @@ async function isLocatorInteractable(locator, page) {
   }).catch(() => false);
 }
 
-async function findInteractableLocator(page, selectors, timeoutMs = 10000, options = {}) {
+async function findInteractableLocator(page, selectors, timeoutMs = 5000, options = {}) {
   const deadline = Date.now() + timeoutMs;
   const requiredTextPattern = options.requiredTextPattern || /찜하기|찜해제|찜취소/;
   const excludedTextPattern = options.excludedTextPattern || /찜목록|찜한\s*상품|찜한\s*목록/;

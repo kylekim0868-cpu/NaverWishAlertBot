@@ -43,7 +43,7 @@ async function navigate3CheckPriceChange({ page, profileId, context }) {
     try {
       logger.debug(`[${itemId}] 페이지 이동: ${itemUrl}`);
       await page.goto(itemUrl, { waitUntil: "domcontentloaded", timeout: cfg.navigationTimeoutMs });
-      await sleep(cfg.pageLoadWaitMs);
+      await sleep(100);
 
       //-- 품절 여부 확인 --
       const bodyText = await page.locator("body").innerText({ timeout: 3000 }).catch(() => "");
@@ -105,7 +105,7 @@ async function navigate3CheckPriceChange({ page, profileId, context }) {
       logger.warn(`[${itemId}] 체크 오류: ${err.message}`);
     }
 
-    await sleep(cfg.actionDelayMs);
+    await sleep(Math.min(cfg.actionDelayMs, 120));
   }
 
   logger.log(`가격 체크 완료 | 변동: ${changedItems.length}개`);

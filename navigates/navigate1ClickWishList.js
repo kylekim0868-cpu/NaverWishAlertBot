@@ -57,10 +57,7 @@ async function navigate1ClickWishList({ page, profileId }) {
   //-- 1) 상품 링크 이동 --
   logger.log(`위시리스트 페이지 이동: ${wishlistUrl}`);
   await page.goto(wishlistUrl, { waitUntil: "domcontentloaded", timeout: cfg.navigationTimeoutMs });
-  await page.waitForLoadState("networkidle", { timeout: cfg.navigationTimeoutMs }).catch(() => {
-    logger.warn("네트워크 아이들 상태 대기 중 타임아웃 발생 — 페이지가 완전히 로드되지 않았을 수 있습니다.");
-    throw new Error("페이지 로드 실패");
-  });
+  await sleep(100);
 
   //-- 2) 로그인 여부 확인 --
   //-- 2-1) 비로그인일 경우 로그인 시도 --
@@ -83,11 +80,11 @@ async function navigate1ClickWishList({ page, profileId }) {
       const submitButton = page.locator(LOGIN_FORM_SELECTORS.submit).first();
 
       await typeLikeHuman(idInput, loginId);
-      await sleep(cfg.pageLoadWaitMs);
+      await sleep(100);
       await typeLikeHuman(pwInput, loginPassword);
 
       await submitButton.click({ timeout: cfg.navigationTimeoutMs });
-      await page.waitForLoadState("networkidle", { timeout: cfg.navigationTimeoutMs }).catch(() => {});
+      await sleep(100);
     } else {
       logger.warn("NAVER_LOGIN_ID / NAVER_LOGIN_PASSWORD가 없어 수동 로그인을 기다립니다.");
       await loginLink.waitFor({ state: "hidden", timeout: cfg.navigationTimeoutMs }).catch(() => {
@@ -105,7 +102,7 @@ async function navigate1ClickWishList({ page, profileId }) {
       const button = await findInteractableLocator(page, WISHLIST_BUTTON_SELECTORS, 700);
       return !!button;
     },
-    { max: 18, delay: cfg.actionDelayMs, distance: 700 },
+    { max: 18, delay: Math.min(cfg.actionDelayMs, 120), distance: 700 },
   );
   logger.log(wishButtonVisible ? "찜하기 버튼을 찾았습니다." : "찜하기 버튼을 찾지 못했습니다.");
 
@@ -138,13 +135,10 @@ async function navigate1ClickWishList({ page, profileId }) {
   } else {
     logger.log("찜하기 버튼 클릭");
     await wishButton.click({ timeout: cfg.navigationTimeoutMs });
-    await page.waitForLoadState("networkidle", { timeout: cfg.navigationTimeoutMs }).catch(() => {});
-    await sleep(cfg.actionDelayMs);
+    await sleep(100);
   }
 
   //-- 5) 몇 초 딜레이 후 브라우저 종료
-  await sleep(cfg.pageLoadWaitMs);
-
   logger.log("1단계 완료");
 
   return {
