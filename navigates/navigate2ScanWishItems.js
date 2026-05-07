@@ -210,7 +210,7 @@ async function findModalByText(page, textPatterns, timeoutMs, options = {}) {
 
     if (bestCandidate) return bestCandidate;
 
-    await sleep(100);
+    await sleep(50);
   }
 
   return null;
@@ -229,13 +229,13 @@ async function findModalByButton(page, buttonName, timeoutMs) {
       if (!isVisible) continue;
 
       const actionButton = container.getByRole("button", { name: buttonName, exact: true }).first();
-      const buttonVisible = await actionButton.isVisible({ timeout: 300 }).catch(() => false);
+      const buttonVisible = await actionButton.isVisible({ timeout: 120 }).catch(() => false);
       if (buttonVisible) {
         return container;
       }
     }
 
-    await sleep(100);
+    await sleep(50);
   }
 
   return null;
@@ -282,7 +282,7 @@ async function readAlertStateSummary(page, alertButton) {
   }
 
   const alertedButton = page.getByRole("button", { name: "알림받는중", exact: true }).first();
-  const alertedVisible = await alertedButton.isVisible({ timeout: 80 }).catch(() => false);
+  const alertedVisible = await alertedButton.isVisible({ timeout: 40 }).catch(() => false);
   if (alertedVisible) {
     const text = normalizeText(await alertedButton.textContent().catch(() => "알림받는중"));
     return { buttonSignature: text || "알림받는중", ariaPressed: null, isAlreadyAlerted: true };
@@ -300,7 +300,7 @@ async function waitForAlertStateChange(page, alertButton, timeoutMs = 8000) {
       return currentState;
     }
 
-    await sleep(50);
+    await sleep(30);
   }
 
   return { buttonSignature: null, ariaPressed: null, isAlreadyAlerted: false };
@@ -326,11 +326,11 @@ async function closeSuccessPopup(page, successPopup, cfg, logger) {
     ? successPopup.getByRole("button", { name: "닫기", exact: true }).first()
     : page.getByRole("button", { name: "닫기", exact: true }).first());
 
-  const visible = await closeButton.isVisible({ timeout: 10 }).catch(() => false);
+  const visible = await closeButton.isVisible({ timeout: 5 }).catch(() => false);
   if (!visible) return;
 
   logger.log("알림 설정 완료 팝업 닫기 버튼 클릭");
-  await closeButton.click({ timeout: 120 }).catch(() => {});
+  await closeButton.click({ timeout: 60 }).catch(() => {});
   return true;
 }
 
@@ -339,7 +339,7 @@ async function findConfirmPopup(page, cfg) {
     .filter({ has: page.getByRole("button", { name: "알림받기", exact: true }) })
     .last();
 
-  const isVisible = await popupCandidate.isVisible({ timeout: 150 }).catch(() => false);
+  const isVisible = await popupCandidate.isVisible({ timeout: 80 }).catch(() => false);
   if (isVisible) {
     return popupCandidate;
   }
@@ -347,7 +347,7 @@ async function findConfirmPopup(page, cfg) {
   const textCandidate = await findModalByText(
     page,
     ALERT_CONFIRM_POPUP_TEXT_PATTERNS,
-    150,
+    80,
     { match: "any", requireButtonName: "알림받기" },
   );
   if (textCandidate) {
@@ -367,7 +367,7 @@ async function clickAlertPopupConfirm(page, alertButton, cfg, logger) {
   logger.log("첫 번째 알림 확인 팝업 감지 완료");
 
   const confirmButton = popup.getByRole("button", { name: "알림받기", exact: true }).first();
-  const visible = await confirmButton.isVisible({ timeout: 30 }).catch(() => false);
+  const visible = await confirmButton.isVisible({ timeout: 20 }).catch(() => false);
   if (!visible) {
     logger.warn("팝업 내 알림받기 버튼을 찾지 못했습니다.");
     return { confirmedClick: false, dialogMessage: null, finalState: null };
@@ -379,7 +379,7 @@ async function clickAlertPopupConfirm(page, alertButton, cfg, logger) {
   }
 
   await closeSuccessPopup(page, null, cfg, logger);
-  const finalState = await waitForAlertStateChange(page, alertButton, 1500);
+  const finalState = await waitForAlertStateChange(page, alertButton, 700);
 
   return {
     confirmedClick: true,
@@ -517,7 +517,7 @@ async function navigate2CheckAlerts({ page, profileId, context }) {
     //--  4-2) 알림받기 활성화일 경우 로그 기록 --
 
     //-- 5) 몇 초 딜레이 후 브라우저 종료
-    logger.log("1단계 완료");
+    logger.log("알림받기 작업 완료");
   
   return {
     loginRequired: isLoginRequired,

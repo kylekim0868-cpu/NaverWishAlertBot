@@ -22,7 +22,7 @@ module.exports = async function runMain({ page, profileId }) {
 
   try {
     if (mode === "all") {
-      for (const step of ["1", "2", "3", "4"]) {
+      for (const step of ["1", "2"]) {
         await NAVIGATE_MAP[step]({ page, profileId, context });
       }
     } else {

@@ -139,7 +139,7 @@ async function navigate1ClickWishList({ page, profileId }) {
   }
 
   //-- 5) 몇 초 딜레이 후 브라우저 종료
-  logger.log("1단계 완료");
+  logger.log("찜하기 작업 완료");
 
   return {
     loginRequired: isLoginRequired,

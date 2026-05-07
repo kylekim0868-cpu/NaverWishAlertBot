@@ -74,5 +74,3 @@ run.bat
 |------|------|------|
 | 1 | navigate1OpenWishlist | 위시리스트 페이지 열기 & 로그인 상태 확인 |
 | 2 | navigate2ScanWishItems | 아이템 전체 스캔 & DB upsert |
-| 3 | navigate3CheckPriceChange | 아이템별 현재 가격/품절 체크, 변동 감지 |
-| 4 | navigate4Alert | 변동 아이템에 대한 알림 출력 및 DB 기록 |
