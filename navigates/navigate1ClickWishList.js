@@ -68,7 +68,7 @@ async function navigate1ClickWishList({ page, profileId }) {
   if (isLoginRequired) {
     logger.warn("로그인이 필요합니다. 로그인 후 다음 단계로 진행합니다.");
 
-    const loginId = process.env.NAVER_LOGIN_ID || process.env.NAVER_ID || "";
+    const loginId = process.env.NAVER_LOGIN_ID || process.env.NAVER_ID || profileId;
     const loginPassword = process.env.NAVER_LOGIN_PASSWORD || process.env.NAVER_PASSWORD || "";
 
     if (loginId && loginPassword) {

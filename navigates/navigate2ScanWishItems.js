@@ -334,6 +334,54 @@ async function closeSuccessPopup(page, successPopup, cfg, logger) {
   return true;
 }
 
+function isLikelyDismissLabel(label) {
+  return [
+    /닫기/i,
+    /close/i,
+    /^x$/i,
+    /오늘하루 안보기/i,
+    /다시 보지 않기/i,
+    /보지 않기/i,
+    /나중에 보기/i,
+    /다음에 보기/i,
+    /skip/i,
+    /no thanks/i,
+  ].some((pattern) => pattern.test(label));
+}
+
+async function closeBlockingPromoPopup(page, cfg, logger) {
+  const popup = await findModalByText(
+    page,
+    [/오늘하루 안보기/, /닫기/],
+    Math.max(200, cfg.actionDelayMs * 2),
+    { match: "any" },
+  );
+
+  if (popup) {
+    const closeButton = popup.getByRole("button", { name: /오늘하루 안보기|닫기/i }).first();
+    const visible = await closeButton.isVisible({ timeout: 100 }).catch(() => false);
+    if (visible) {
+      logger.log("방해 팝업 닫기 버튼 클릭");
+      await closeButton.click({ timeout: cfg.navigationTimeoutMs }).catch(() => {});
+      await sleep(120);
+      return true;
+    }
+  }
+
+  const textButton = page.getByRole("button", { name: /오늘하루 안보기|닫기/i }).first();
+  const textButtonVisible = await textButton.isVisible({ timeout: 100 }).catch(() => false);
+  if (textButtonVisible) {
+    logger.log("방해 팝업 전역 닫기 버튼 클릭");
+    await textButton.click({ timeout: cfg.navigationTimeoutMs }).catch(() => {});
+    await sleep(120);
+    return true;
+  }
+
+  await page.keyboard.press("Escape").catch(() => {});
+  await sleep(60);
+  return false;
+}
+
 async function findConfirmPopup(page, cfg) {
   const popupCandidate = page.locator(SMARTSTORE_CONFIRM_POPUP_SELECTORS.join(", "))
     .filter({ has: page.getByRole("button", { name: "알림받기", exact: true }) })
@@ -410,7 +458,7 @@ async function navigate2CheckAlerts({ page, profileId, context }) {
 
   logger.log(`스마트스토어 페이지 이동: ${smartstoreUrl}`);
   await page.goto(smartstoreUrl, { waitUntil: "domcontentloaded", timeout: cfg.navigationTimeoutMs });
-  await sleep(100);
+  await closeBlockingPromoPopup(page, cfg, logger);
 
   //-- 2) 로그인 여부 확인 --
   //-- 2-1) 비로그인일 경우 로그인 시도 --
@@ -421,7 +469,7 @@ async function navigate2CheckAlerts({ page, profileId, context }) {
   if (isLoginRequired) {
     logger.warn("로그인이 필요합니다. 로그인 후 다음 단계로 진행합니다.");
 
-    const loginId = process.env.NAVER_LOGIN_ID || process.env.NAVER_ID || "";
+    const loginId = process.env.NAVER_LOGIN_ID || process.env.NAVER_ID || profileId;
     const loginPassword = process.env.NAVER_LOGIN_PASSWORD || process.env.NAVER_PASSWORD || "";
 
     if (loginId && loginPassword) {
